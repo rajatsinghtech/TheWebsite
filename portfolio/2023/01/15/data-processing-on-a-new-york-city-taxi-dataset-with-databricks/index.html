@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Processing on a New York City Taxi Dataset with Databricks – Rajat Singh</title>
+<meta name="description" content="Analysing the NYC taxicab dataset (Jan 2019–Apr 2022) with Azure Blob Storage, Spark and Databricks — plus a fare-prediction ML model.">
+<link rel="canonical" href="https://rajatsingh.tech/portfolio/2023/01/15/data-processing-on-a-new-york-city-taxi-dataset-with-databricks/">
+<meta property="og:title" content="Data Processing on a New York City Taxi Dataset with Databricks – Rajat Singh">
+<meta property="og:description" content="Analysing the NYC taxicab dataset with Azure Blob Storage, Spark and Databricks — plus a fare-prediction ML model.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://rajatsingh.tech/portfolio/2023/01/15/data-processing-on-a-new-york-city-taxi-dataset-with-databricks/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/portfolio/assets/portfolio.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+<a href="/" class="brand">Rajat Singh</a>
+<nav class="nav-links">
+<a href="/portfolio/" class="hide-sm">Portfolio Home</a>
+<a href="/portfolio/apps/" class="hide-sm">Apps</a>
+<a href="/portfolio/sample-page/" class="hide-sm">Contact</a>
+<a href="https://rajatsingh.tech/" class="nav-cta">rajatsingh.tech</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="crumbs"><a href="/portfolio/">Home</a> → <a href="/portfolio/category/uncategorized/">Uncategorized</a> → NYC Taxi Databricks</p>
+<article class="article">
+<span class="tag">Uncategorized</span>
+<h1>Data Processing on a New York City Taxi Dataset with Databricks</h1>
+<div class="meta">January 15, 2023 · Rajat</div>
+<p>PS – These projects are from year 2022 – year 2023. Restored these post from old hosting service.</p>
+<p><a href="https://rajatsingh.tech/portfolio/bde_at_2.html"><strong><em>Databricks Notebook Link</em></strong></a></p>
+<h2>1. Introduction</h2>
+<p>The aim of this project is to analyse the New York Taxicab dataset from January 2019 to April 2022 to answer critical business problem statements — and to create a machine learning model predicting taxi ride fares.</p>
+<h2>2. Problem Statement</h2>
+<ul>
+<li>Store data in Azure Blob Storage; perform data cleaning.</li>
+<li>Combine yellow and green taxi datasets; save the parquet file in DBFS.</li>
+<li>Answer business questions with Spark SQL: trips per year/month; busiest weekday and hour; average passengers; average amount per trip and per passenger; trip duration/distance/speed stats per taxi colour; tip percentages; duration-bin analysis and which bin a driver should target.</li>
+<li>Create an ML model predicting total fare, applied to April 2022 data.</li>
+</ul>
+<h2>3. Dataset</h2>
+<p>Since 1971, the NYC Taxi and Limousine Commission (TLC) has published millions of yellow and green taxi trip records: pick-up/drop-off times and locations, distances, rates, payment types, and passenger counts. Yellow cabs hail street passengers citywide (~13,600 medallions); green cabs (since August 2013) improve borough availability.</p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/Picture1.png" alt="Yellow vs green taxi coverage" loading="lazy"></figure>
+<p>Key fields (yellow: tpep_* datetime; green: lpep_* datetime; otherwise shared): VendorID, pickup/dropoff datetime, passenger_count, trip_distance, PULocationID/DOLocationID, RateCodeID, store_and_fwd_flag, payment_type, fare_amount, extra, mta_tax, improvement_surcharge, tip_amount, tolls_amount, total_amount, congestion_surcharge, airport_fee (yellow), trip_type (green).</p>
+<h2>4. Architecture</h2>
+<p>Three core platforms: <strong>Azure Blob Storage</strong> (data lake; account <code>rajatsinghuts</code>, container <code>bde-at-2</code>), <strong>Apache Spark</strong> (distributed processing), and <strong>Databricks</strong> (managed Spark for the full ML lifecycle).</p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/d.png" alt="Project process diagram" loading="lazy"></figure>
+<h2>5. Project Structure and its Processes</h2>
+<ul>
+<li>Uploaded green and yellow taxi files to Blob storage; mounted the storage in a Databricks cluster.</li>
+<li><strong>Data Cleaning:</strong> removed trips ending before starting, negative or extreme speeds, implausible distances/durations, &gt;5 passengers, &lt;30 seconds, and dates outside 2019-01-01–2022-05-01.</li>
+<li><strong>Transformation:</strong> added <code>time_duration</code> (hours) and <code>speed</code> (mph).</li>
+<li><strong>Merging:</strong> renamed datetime columns to <code>pickup_datetime</code>/<code>dropoff_datetime</code>, added <code>taxi_type</code>, merged with missing-column support; saved <code>dbfs/taxis_combined_dataset.parquet</code>.</li>
+<li><strong>Analytics:</strong> Spark SQL for business questions. <strong>ML:</strong> linear regression and decision tree on trip_distance, time_duration, taxi_type → total_amount.</li>
+</ul>
+<h2>7. Business Problems and Solutions</h2>
+<p><em>Trips per year/month, busiest weekday/hour, averages per trip and per passenger:</em></p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/1-1.png" alt="Trips over time results" loading="lazy"></figure>
+<p><em>Duration, distance and speed stats per taxi colour:</em></p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/21.png" alt="Stats per taxi colour" loading="lazy"></figure>
+<p><em>Percentage of trips with tips:</em></p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/2-4.png" alt="Tip percentage" loading="lazy"></figure>
+<p><em>Of tipped trips, percentage with tips ≥ $10:</em></p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/3.png" alt="Tips over ten dollars" loading="lazy"></figure>
+<p><em>Duration bins (under 5 min … 60+ min): average speed and distance per dollar:</em></p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/4.png" alt="Duration bin analysis" loading="lazy"></figure>
+<p><em>Which bin should a driver target?</em> The <strong>5–10 minute</strong> bin — very low average distance per dollar (lower fuel cost) with a substantially high trip count.</p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/5.png" alt="Recommended duration bin" loading="lazy"></figure>
+<h2>8. Machine Learning</h2>
+<ul>
+<li>Train: dates before April 2022; test: April 2022 onward.</li>
+<li>Features: trip_distance, time_duration, taxi_type → total_amount (StringIndexer + OneHot for categoricals, assembled into a vector).</li>
+<li>Models: Linear Regression (train RMSE 154.46) vs Decision Tree (154.48) — linear regression chosen; test RMSE 7.08.</li>
+</ul>
+<table><tbody>
+<tr><td><strong>Model</strong></td><td><strong>Training RMSE</strong></td></tr>
+<tr><td><strong>Linear Regression</strong></td><td>154.46254572600506</td></tr>
+<tr><td><strong>Decision Tree</strong></td><td>154.47532920782268</td></tr>
+</tbody></table>
+<h2>9. Conclusion</h2>
+<p>A linear regression model with test RMSE ≈ 7.08 predicts fares, and all business questions were answered with Spark SQL.</p>
+</article>
+<div class="post-nav">
+<a class="btn" href="/portfolio/2025/07/19/revolutionizing-data-entry-with-llm-models-transforming-unstructured-text-into-json/">← Newer post</a>
+<a class="btn btn-primary" href="/portfolio/2023/01/13/data-lakehouse-using-snowflake-youtube-trending-dataset/">Older post →</a>
+</div>
+</main>
+<footer class="contact"><div class="wrap"><div class="foot">© <span id="year"></span> Rajat Singh · <a href="/portfolio/">Portfolio</a> · <a href="/">Home</a></div></div></footer>
+<script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+# Static portfolio — no WordPress, no PHP. Replaces the WP front controller.
+# Each public WP URL is either a static file at the same path or a 301 below.
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /portfolio/
+
+# WP junk: feeds, REST, oEmbed, xmlrpc, shortlinks -> canonical equivalents
+RewriteRule ^feed/?$ /portfolio/ [R=301,L]
+RewriteRule ^comments/feed/?$ /portfolio/ [R=301,L]
+RewriteRule ^(.+)/feed/?$ /portfolio/$1/ [R=301,L]
+RewriteRule ^wp-json/?(.*)$ /portfolio/ [R=301,L]
+RewriteRule ^xmlrpc\.php$ /portfolio/ [R=301,L]
+RewriteCond %{QUERY_STRING} ^p=\d+ [NC]
+RewriteRule ^$ /portfolio/ [R=301,L]
+
+# Date archives (were only breadcrumb links, no sitemap entries) -> portfolio home
+RewriteRule ^[0-9]{4}/?$ /portfolio/ [R=301,L]
+RewriteRule ^[0-9]{4}/[0-9]{2}/?$ /portfolio/ [R=301,L]
+RewriteRule ^[0-9]{4}/[0-9]{2}/[0-9]{2}/?$ /portfolio/ [R=301,L]
+
+# Author / category pagination -> canonical archive
+RewriteRule ^author/([^/]+)/page/[0-9]+/?$ /portfolio/author/$1/ [R=301,L]
+RewriteRule ^category/([^/]+)/page/[0-9]+/?$ /portfolio/category/$1/ [R=301,L]
+</IfModule>

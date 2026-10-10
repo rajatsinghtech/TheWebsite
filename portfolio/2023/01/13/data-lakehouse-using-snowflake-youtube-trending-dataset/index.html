@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Lakehouse using Snowflake – YouTube Trending Dataset – Rajat Singh</title>
+<meta name="description" content="Ingesting YouTube trending data from Azure Blob Storage into a Snowflake lakehouse — staging, merging, cleaning and answering business questions.">
+<link rel="canonical" href="https://rajatsingh.tech/portfolio/2023/01/13/data-lakehouse-using-snowflake-youtube-trending-dataset/">
+<meta property="og:title" content="Data Lakehouse using Snowflake – YouTube Trending Dataset – Rajat Singh">
+<meta property="og:description" content="Ingesting YouTube trending data from Azure Blob Storage into a Snowflake lakehouse.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://rajatsingh.tech/portfolio/2023/01/13/data-lakehouse-using-snowflake-youtube-trending-dataset/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/portfolio/assets/portfolio.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+<a href="/" class="brand">Rajat Singh</a>
+<nav class="nav-links">
+<a href="/portfolio/" class="hide-sm">Portfolio Home</a>
+<a href="/portfolio/apps/" class="hide-sm">Apps</a>
+<a href="/portfolio/sample-page/" class="hide-sm">Contact</a>
+<a href="https://rajatsingh.tech/" class="nav-cta">rajatsingh.tech</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="crumbs"><a href="/portfolio/">Home</a> → <a href="/portfolio/category/uncategorized/">Uncategorized</a> → Snowflake YouTube Lakehouse</p>
+<article class="article">
+<span class="tag">Uncategorized</span>
+<h1>Data Lakehouse using Snowflake – YouTube Trending Dataset</h1>
+<div class="meta">January 13, 2023 · Rajat</div>
+<p>PS – These projects are from year 2022 – year 2023. Restored these post from old hosting service.</p>
+<p><a rel="noreferrer noopener" href="https://github.com/singhrajat21098/Snowflake_Youtube_Trending_dataset" target="_blank"><strong>GitHub Link</strong></a></p>
+<h2>1. Introduction</h2>
+<p>The project focusses on ingesting YouTube trending data from Microsoft Azure Blob Storage to create a data lakehouse in Snowflake. This data is further merged, cleaned and stored to answer some critical business questions.</p>
+<h2>2. Datasets</h2>
+<p>Two types of files were ingested: the YouTube Trending Dataset and the YouTube Categories Dataset — 11 files each, one per country (Brazil, Canada, Germany, France, Great Britain, India, Japan, Korea, Mexico, Russia, United States).</p>
+<p><strong>2.1 YouTube Trending Dataset.</strong> 11 CSV files with daily records for top trending videos per country from 2020-08-12 to 2022-01-28. Attributes include video_id, title, publishedAt, channelId, channelTitle, categoryId, trending_date, view_count, likes, dislikes, comment_count, comments_disabled.</p>
+<p><strong>2.2 YouTube Categories Dataset.</strong> 11 unstructured JSON files with 29 categories each (category_id, category_title); category ids can differ per country.</p>
+<h2>3. Architecture</h2>
+<p>Azure Blob Storage holds the CSV and JSON files, later ingested into Snowflake for processing.</p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/1.png" alt="Architecture of the project" loading="lazy"><figcaption>Figure 1. Architecture of the Project</figcaption></figure>
+<p><strong>3.1 Microsoft Azure Blob Storage.</strong> Container <code>bde-at-1</code> in storage account <code>rajatsinghuts</code> stores all JSON and CSV files.</p>
+<p><strong>3.2 Snowflake.</strong> Snowflake’s Data Cloud (SaaS) was used for CRUD operations on the blob data, including extracting information from JSON files into tables.</p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/bde.drawio-1.png" alt="Data flow chart" loading="lazy"><figcaption>Figure 2. Data Flow Chart</figcaption></figure>
+<p>Transformation steps in Snowflake: <strong>Staging</strong> (external tables over blob storage), <strong>Data Merging</strong> (table_youtube_trending ⨝ table_youtube_category on country + category_id), <strong>Data Cleaning</strong> (duplicate rows removed from table_youtube_final), <strong>Data Warehousing</strong> (final table stored for use).</p>
+<p><strong>3.3 Consumer Systems.</strong> The processed database can feed business applications and visualisation tools.</p>
+<h2>4. Database Details and Data Dictionary</h2>
+<table><tbody>
+<tr><td><strong>Type</strong></td><td><strong>Name</strong></td></tr>
+<tr><td><strong>Database</strong></td><td>BDE_AT_1</td></tr>
+<tr><td><strong>Storage integration</strong></td><td>AZURE_BDE_AT_1</td></tr>
+<tr><td><strong>Stage</strong></td><td>STAGE_BDE_AT_1</td></tr>
+<tr><td><strong>File format</strong></td><td>FILE_FORMAT_CSV</td></tr>
+<tr><td><strong>External table</strong></td><td>EX_TABLE_YOUTUBE_TRENDING</td></tr>
+<tr><td><strong>External table</strong></td><td>EX_TABLE_YOUTUBE_CATEGORY</td></tr>
+<tr><td><strong>Table</strong></td><td>TABLE_YOUTUBE_TRENDING</td></tr>
+<tr><td><strong>Table</strong></td><td>TABLE_YOUTUBE_CATEGORY</td></tr>
+<tr><td><strong>Table</strong></td><td>TABLE_YOUTUBE_FINAL</td></tr>
+<tr><td><strong>Table</strong></td><td>TABLE_YOUTUBE_DUPLICATES</td></tr>
+</tbody></table>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/2.png" alt="Data types of TABLE_YOUTUBE_FINAL" loading="lazy"><figcaption>Figure 3. Data Types of TABLE_YOUTUBE_FINAL</figcaption></figure>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/2-1.png" alt="Data types of TABLE_YOUTUBE_TRENDING" loading="lazy"><figcaption>Figure 4. Data Types of TABLE_YOUTUBE_TRENDING</figcaption></figure>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/2-2.png" alt="Data types of TABLE_YOUTUBE_CATEGORY" loading="lazy"><figcaption>Figure 5. Data Types of TABLE_YOUTUBE_CATEGORY</figcaption></figure>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/01/2-3.png" alt="Data types of TABLE_YOUTUBE_DUPLICATES" loading="lazy"><figcaption>Figure 6. Data types of TABLE_YOUTUBE_DUPLICATES</figcaption></figure>
+<h2>5. SQL Queries</h2>
+<p><strong>Business Question.</strong> For each country, which category_title has the most distinct videos and what is its percentage (2 decimals) out of the total distinct videos of that country? Order by category_title and country.</p>
+<blockquote>
+<p>select d_by_country.country, category_title, total_category_video, total_country_video, total_category_video/total_country_video*100 as percentage from (select country, count(distinct title) as total_country_video from table_youtube_final group by country) d_by_country inner join (select * from (select country, category_title, total_category_video, rank() over(partition by country order by total_category_video desc) as rk from (select country, category_title, count(distinct title) as total_category_video from table_youtube_final group by country, category_title)) where rk = 1) d_by_category on d_by_country.country = d_by_category.country order by category_title, country;</p>
+</blockquote>
+<p><strong>Explanation.</strong> The first part counts distinct video titles by country; the second counts by country and category, using rank() partitioned by country to keep the top category (nested, since Snowflake disallows WHERE on window functions directly). The two parts are joined on country.</p>
+<h2>6. Business Problem</h2>
+<p>If launching a new YouTube channel (excluding Music and Entertainment), which category would top the trends? By sum of views: Music (739.9B), Entertainment (519.5B), Gaming (195.8B), People &amp; Blogs (187.4B) lead. But to avoid regional bias, count appearances in each country’s TOP 2: People &amp; Blogs (9), Gaming (8), Sports (3), Comedy (2). Conclusion: create in the <strong>People &amp; Blogs</strong> category.</p>
+<h2>7. References</h2>
+<p>Snowflake. n.d. Snowflake Documentation. https://docs.snowflake.com/en/user-guide/intro-key-concepts.html</p>
+</article>
+<div class="post-nav">
+<a class="btn" href="/portfolio/2023/01/15/data-processing-on-a-new-york-city-taxi-dataset-with-databricks/">← Newer post</a>
+<a class="btn btn-primary" href="/portfolio/">All posts →</a>
+</div>
+</main>
+<footer class="contact"><div class="wrap"><div class="foot">© <span id="year"></span> Rajat Singh · <a href="/portfolio/">Portfolio</a> · <a href="/">Home</a></div></div></footer>
+<script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building a Machine Learning-Based Diamond Price Predictor: How I Created a Flask Web App Hosted on Azure – Rajat Singh</title>
+<meta name="description" content="Training a diamond price prediction model with machine learning and serving it with a Flask web app hosted on Azure App Service.">
+<link rel="canonical" href="https://rajatsingh.tech/portfolio/2025/07/19/building-a-machine-learning-based-diamond-price-predictor-how-i-created-a-flask-web-app-hosted-on-azure/">
+<meta property="og:title" content="Building a Machine Learning-Based Diamond Price Predictor: How I Created a Flask Web App Hosted on Azure – Rajat Singh">
+<meta property="og:description" content="Training a diamond price prediction model with machine learning and serving it with a Flask web app hosted on Azure App Service.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://rajatsingh.tech/portfolio/2025/07/19/building-a-machine-learning-based-diamond-price-predictor-how-i-created-a-flask-web-app-hosted-on-azure/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/portfolio/assets/portfolio.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+<a href="/" class="brand">Rajat Singh</a>
+<nav class="nav-links">
+<a href="/portfolio/" class="hide-sm">Portfolio Home</a>
+<a href="/portfolio/apps/" class="hide-sm">Apps</a>
+<a href="/portfolio/sample-page/" class="hide-sm">Contact</a>
+<a href="https://rajatsingh.tech/" class="nav-cta">rajatsingh.tech</a>
+</nav>
+</div></header>
+<main class="wrap">
+<p class="crumbs"><a href="/portfolio/">Home</a> → <a href="/portfolio/category/uncategorized/">Uncategorized</a> → Diamond Price Predictor</p>
+<article class="article">
+<span class="tag">Uncategorized</span>
+<h1>Building a Machine Learning-Based Diamond Price Predictor: How I Created a Flask Web App Hosted on Azure</h1>
+<div class="meta">July 19, 2025 · Rajat</div>
+<p>PS – These projects are from year 2022 – year 2023. Restored these post from old hosting service.</p>
+<h2>Introduction</h2>
+<p>Diamonds are one of the most coveted and valuable gemstones in the world, with their worth determined by various factors such as carat, diamond size, color, and clarity. Determining the value of a diamond can be a complex process. In recent years, machine learning has become increasingly popular for predicting diamond prices.</p>
+<p>In this blog post, I will share my experience of building a diamond price prediction model using machine learning: the data cleaning process, training the model on inputs such as carat, size, colour and clarity, creating a Flask web app, and hosting it on Azure App Service — plus a webpage for interacting with the API using HTML, Bootstrap 5, CSS, and JavaScript.</p>
+<h2>Steps to achieve the creation of this project</h2>
+<ol>
+<li><strong>Collect Data:</strong> The data used for this project was taken from Kaggle: https://www.kaggle.com/datasets/shivam2503/diamonds</li>
+<li><strong>Clean the Data:</strong> Remove irrelevant or missing data, normalize, and convert categorical variables into numerical values.</li>
+<li><strong>Train a Machine Learning Model:</strong> A Jupyter notebook covers data cleaning and training. (PS – the notebook was created ages ago by me.)</li>
+<li><strong>Build a Flask Web App:</strong> A Flask app serves as an API for the trained model. The code below was tested locally before deployment on Azure — install all dependencies before running it.</li>
+</ol>
+<pre><code>from flask import Flask,url_for, jsonify, request
+from flask.wrappers import Response
+from joblib import dump, load
+from flask_cors import CORS, cross_origin
+
+app = Flask(__name__)
+app.ml_model = load('diamond_predictor.joblib')
+
+@app.route('/diamonds_api/', methods=['GET', 'POST'])
+@cross_origin()
+def hello():
+    query_params = request.args
+    color = int(query_params.get('color'))
+    clarity = int(query_params.get('clarity'))
+    cut = int(query_params.get('cut'))
+    carat = float(query_params.get('carat'))
+    x = float(query_params.get('x'))
+    y = float(query_params.get('y'))
+    z = float(query_params.get('z'))
+    table = float(query_params.get('table'))
+    depth_percent = 2 * z/(x+y)
+    input_params = [[carat,cut,color, clarity, depth_percent, table, x, y, z]]
+    output = app.ml_model.predict(input_params)
+    return jsonify({'price':str(output[0]),
+                    **query_params.to_dict()})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=105)</code></pre>
+<p>5. <strong>Host the Flask App on Azure App Service:</strong> Azure App Service is a cloud-based platform for deploying and managing web apps. The <a rel="noreferrer noopener" href="https://learn.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=flask%2Cwindows%2Cazure-cli%2Cvscode-deploy%2Cdeploy-instructions-azportal%2Cterminal-bash%2Cdeploy-instructions-zip-azcli" target="_blank">Azure tutorial to deploy a Flask app</a> was really helpful.</p>
+<p>6. <strong>Build a Webpage:</strong> A webpage lets users interact with the API using HTML, Bootstrap 5, CSS, and JavaScript.</p>
+<figure><img src="https://rajatsingh.tech/portfolio/wp-content/uploads/2023/02/image-1024x556.png" alt="Diamond price predictor web app" loading="lazy"></figure>
+<h2>Summary</h2>
+<p>After completing all the steps, I successfully created a diamond price prediction web app: a machine learning model trained on a clean dataset of diamond prices and characteristics, hosted on a Flask web app deployed on Azure App Service, with a webpage for interaction. The project demonstrates the power of machine learning for price prediction and the benefits of cloud platforms like Azure — with valuable experience in data cleaning, machine learning, web development, and cloud computing.</p>
+</article>
+<div class="post-nav">
+<a class="btn" href="/portfolio/2025/07/19/polars-vs-pandas-a-detailed-comparison-for-data-processing/">← Previous post</a>
+<a class="btn btn-primary" href="/portfolio/2025/07/19/revolutionizing-data-entry-with-llm-models-transforming-unstructured-text-into-json/">Next post →</a>
+</div>
+</main>
+<footer class="contact"><div class="wrap"><div class="foot">© <span id="year"></span> Rajat Singh · <a href="/portfolio/">Portfolio</a> · <a href="/">Home</a></div></div></footer>
+<script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+</body>
+</html>
